@@ -1,8 +1,8 @@
 ---
 nginx_log_dir: /var/log/nginx
 nginx_user: nginx
-nginx_ssl_cert_file: /etc/ssl/certs/{{ HOSTNAME }}
+# nginx_ssl_cert_file: /etc/ssl/certs/{{ HOSTNAME }}
 server_name: localhost
 
-# key_file: /etc/airflow/certs/airflow.key
-# cert_file: /etc/airflow/certs/airflow.crt
+key_file: /etc/nginx/ssl/nginx.key
+cert_file: /etc/nginx/ssl/nginx.crt

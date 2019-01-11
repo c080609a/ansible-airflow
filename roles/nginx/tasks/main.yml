@@ -1,4 +1,11 @@
 ---
+
+- name: Add epel-release repo
+  yum:
+    name: epel-release
+    state: present
+  become: true
+
 - name: Install nginx 
   yum: 
     name: nginx
@@ -6,30 +13,59 @@
   become: true
 
 - name: Create nginx sites directories
-  file: 
-    path: /etc/nginx/sites-available
+  file:
+    path: "/etc/nginx/{{ item }}"
     state: directory
-    mode: 0744
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_user }}"
+    owner: root 
+    group: root
+    mode: 755 
+  with_items:
+    - "sites-available"
+    - "sites-enabled"
+    - "ssl"
   become: true
 
-# - name: Copy nginx config
-#   copy: 
-#     src: files/nginx.conf 
-#     dest: /etc/nginx/sites-available/default
-#   become: true
+- name: Copy nginx config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: 644
+  become: true
 
-# - name: Enable configuration
-#   file:
-#     dest: /etc/nginx/sites-enabled/default
-#     src: /etc/nginx/sites-available/default
-#     state: link
-#   become: true
+- name: Copy SSL key
+  copy:
+    src: files/nginx.key
+    dest: /etc/nginx/ssl/nginx.key
+    owner: root
+    mode: 600
+  become: true 
 
-# - name: copy index.html
-#   template: 
-#     src: templates/index.html.j2 
-#     dest: /usr/share/nginx/html/index.html
-#     mode: 0644
-#   become: true
+- name: Copy SSL cert
+  copy:
+    src: files/nginx.crt
+    dest: /etc/nginx/ssl/nginx.crt
+    owner: root
+    mode: 600
+  become: true 
+
+
+- name: Enable configuration
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    src: /etc/nginx/sites-available/default
+    state: link
+  become: true
+
+- name: copy index.html
+  template: 
+    src: templates/index.html.j2 
+    dest: /usr/share/nginx/html/index.html
+    mode: 0644
+  become: true
+
+- name: restart nginx
+  service: 
+    name: nginx 
+    state: restarted
+  become: true
+  # when: configure_nginx_conf|changed
