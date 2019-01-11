@@ -1,0 +1,46 @@
+- name: Check whether miniconda is installed and on system path 
+  command: 'which conda' 
+  register: miniconda_installed
+  ignore_errors: yes
+
+- debug: 
+    msg: "miniconda_installed: {{ miniconda_installed.rc == 0 }}"
+
+- name: Download miniconda installer
+  get_url:
+    url={{ miniconda_installer.url }}/{{ miniconda_installer.file }}
+    dest=/var/tmp/{{ miniconda_installer.file }}
+    mode=0755
+  register: miniconda_downloaded
+  when: miniconda_installed.rc != 0
+
+- name: Install miniconda
+  become: no
+  command: '/var/tmp/{{ miniconda_installer.file }} -b -p {{ miniconda_path }}
+      creates={{ miniconda_path }}'
+  register: miniconda_installed
+  when: (miniconda_downloaded|success and miniconda_installed.rc != 0)
+
+- name: Create miniconda environment
+  become: no 
+  shell: "{{ miniconda_path }}/bin/conda create --yes -q -n {{ miniconda_env_name }} python={{ miniconda_env_python_version }} {{ miniconda_env_pkgs }} creates={{ miniconda_path }}/envs/{{ miniconda_env_name }}"
+  when: miniconda_installed | success
+
+- name: Create symbolic link 
+  become: no
+  file:
+    src: "{{ miniconda_path }}/etc/profile.d/conda.sh"
+    dest: "/etc/profile.d/conda.sh"
+    state: link
+
+- name: Add conda activate to shell rc 
+  become: no
+  lineinfile:
+    dest: "~/.bashrc"
+    line: "conda activate"
+  
+- name: Activate miniconda environment
+  become: no
+  command: "{{ miniconda_path}}/bin/conda activate {{ miniconda_env_name }}"
+  args:
+    executable: /bin/bash

@@ -1,0 +1,9 @@
+---
+- name: Install Airflow and miniconda
+  hosts: app
+  roles:
+    # - miniconda
+    # - airflow
+    - nginx
+  tasks:
+   - debug: msg="play_hosts={{play_hosts}}"

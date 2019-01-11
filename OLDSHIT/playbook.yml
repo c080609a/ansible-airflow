@@ -1,0 +1,61 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install EPEL 
+      yum: 
+        name: epel-release 
+        state: present
+      become: yes
+
+    - name: Install Python and prereqs 
+      yum: "name='{{ item }}' state=present"
+      become: yes
+      with_items:
+        - "@Development tools"
+        - zlib-devel
+        - bzip2-devel
+        - openssl-devel
+        - ncurses-devel
+        - sqlite-devel
+        - readline-devel
+        - tk-devel
+        - gdbm-devel
+        - python34
+        - python34-devel 
+
+    - name: Check whether pip is installed
+      command: "pip --version"
+      ignore_errors: true
+      register: pip_is_installed
+      changed_when: false
+
+    - name: Download pip
+      get_url: 
+        url: "https://bootstrap.pypa.io/get-pip.py"
+        dest: "/tmp"
+    
+    - name: Install pip
+      command: "python3 /tmp/get-pip.py"
+      when: pip_is_installed.rc != 0
+      
+    - name: Delete get-pip.py
+      file: 
+        state: absent 
+        path: "/tmp/get-pip.py"
+      when: pip_is_installed.rc != 0
+
+    - name: Install Airflow
+      environment:
+        SLUGIFY_USES_TEXT_UNIDECODE: yes
+      pip: name="apache-airflow"
+      become: true
+
+    - name: Airflow initdb
+      # nondestructive so it's okay to run multiple times
+      shell: "airflow initdb"
+
+    - name: Start Airflow server
+      shell: "airflow webserver --daemon"
+
+       

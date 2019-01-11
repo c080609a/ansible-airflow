@@ -1,0 +1,86 @@
+---
+
+- include: ssl-config.yml
+
+- name: Create a user account to run Airflow
+  user:
+    name: "{{ airflow_user }}"
+    state: present
+    home: "{{ airflow_user_home }}"
+  become: yes
+
+- name: Check if Airflow is installed
+  become_user: "{{ airflow_user }}"
+  become: yes
+  stat:
+    path: "{{ airflow_executable_dir }}/airflow"
+  register: airflow_binary
+
+- name: Add Airflow to path
+  become: yes
+  lineinfile:
+    dest: "/home/{{ airflow_user }}/.bashrc"
+    line: "PATH=$PATH:{{ airflow_executable_dir }}"
+
+- name: Set AIRFLOW_HOME
+  become: yes
+  lineinfile:
+    dest: "/home/{{ airflow_user }}/.bashrc"
+    line: "export AIRFLOW_HOME={{ airflow_home }}"
+
+- name: Install Airflow from conda-forge channel
+  become: yes
+  command: "{{ miniconda_conda_bin }} install --yes -c conda-forge airflow-with-password"
+  when: not airflow_binary.stat.exists
+
+- name: Create Airflow directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0744
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_user }}"
+  with_items:
+    - "{{ airflow_home }}"
+    - "{{ airflow_dags_folder }}"
+    - "{{ airflow_logs_folder }}"
+  become: yes
+
+- name: Copy Airflow configuration
+  template:
+    src: airflow.cfg.j2
+    dest: "{{ airflow_home }}/airflow.cfg"
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_user }}"
+    mode:  0777
+  become: yes
+
+- name: Initialize Airflow database
+  become_user: "{{ airflow_user }}"
+  become: yes
+  shell: "{{ airflow_executable_dir }}/airflow initdb"
+  environment:
+    AIRFLOW_HOME: "{{ airflow_home }}"
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: "sqlite:////tmp/airflow.db"
+
+- name: Copy airflow init.d script
+  template:
+    src: "init.d-airflow.j2"
+    dest:  "/etc/init.d/airflow"
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_user }}"
+    mode:  0641
+  become: yes
+
+
+# - name: Stop Airflow service
+#   service:
+#     name: airflow
+#     state: stopped
+#   become: yes
+
+# - name: Start Airflow service
+#   service:
+#     name: airflow
+#     state: started
+#   become: yes

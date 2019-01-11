@@ -1,0 +1,35 @@
+---
+- name: Install nginx 
+  yum: 
+    name: nginx
+    # update_cache: yes
+  become: true
+
+- name: Create nginx sites directories
+  file: 
+    path: /etc/nginx/sites-available
+    state: directory
+    mode: 0744
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+  become: true
+
+# - name: Copy nginx config
+#   copy: 
+#     src: files/nginx.conf 
+#     dest: /etc/nginx/sites-available/default
+#   become: true
+
+# - name: Enable configuration
+#   file:
+#     dest: /etc/nginx/sites-enabled/default
+#     src: /etc/nginx/sites-available/default
+#     state: link
+#   become: true
+
+# - name: copy index.html
+#   template: 
+#     src: templates/index.html.j2 
+#     dest: /usr/share/nginx/html/index.html
+#     mode: 0644
+#   become: true

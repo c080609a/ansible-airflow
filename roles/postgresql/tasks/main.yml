@@ -1,0 +1,39 @@
+---
+- name: Install PostgreSQL 
+  yum: 
+    name: '{{ item }}' 
+    state: present
+  become: true
+  with_items: 
+    - postgresql
+    - postgresql-contrib
+    - postgresql-devel
+    - postgresql-libs
+    - python-psycopg2
+
+- name: Ensure PostgreSQL data directory exists
+  become: true
+  file:
+    path: "{{ postgresql_data_dir }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+    mode: 0700
+
+- name: Ensure PostgreSQL is started and enabled on boot
+  service:
+    name: postgresql
+    state: started 
+    enabled: true 
+  become: true
+
+- name: Create new PostgreSQL database
+  run_once: true
+  postgresql_db:
+    name: "airflow_metadata"
+    login_user: "airflow_db"
+    login_password: "airflow_db"
+    login_host: "{{ pg_host }}"
+    state: present
+
+  

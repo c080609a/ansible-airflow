@@ -1,0 +1,128 @@
+[core]
+# The home folder for airflow; default is ~/airflow
+airflow_home = {{ airflow_home }}
+
+# The folder where your airflow pipelines live, most likely a
+# subfolder in a code repository
+# This path must be absolute
+dags_folder = {{ airflow_dags_folder }}
+
+# sql_alchemy_conn = sqlite:///{{ airflow_home }}/airflow.db
+sql_alchemy_conn = sqlite:////tmp/airflow.db
+
+# The folder where airflow should store its log files
+# This path must be absolute
+base_log_folder = {{ airflow_logs_folder }}
+
+logging_level = {{ airflow_logging_level }}
+log_format = {{ airflow_log_format }}
+simple_log_format = {{ airflow_simple_log_format }}
+log_filename_template = {{ airflow_log_filename_template }}
+log_processor_filename_template = {{ airflow_log_processor_filename_template }}
+
+# Hostname by providing a path to a callable, which will resolve the hostname
+hostname_callable = {{ airflow_hostname_callable }}
+
+# Default timezone in case supplied date times are naive
+# can be utc (default), system, or any IANA timezone string (e.g. Europe/Amsterdam)
+default_timezone = {{ airflow_default_timezone }}
+
+[webserver]
+# The base url of your website as airflow cannot guess what domain or
+# cname you are using. This is used in automated emails that
+# airflow sends to point links to the right web server
+base_url = https://localhost:443
+
+# The ip specified when starting the web server
+web_server_host = 0.0.0.0
+
+# The port on which to run the web server
+web_server_port = 443
+
+# Paths to the SSL certificate and key for the web server. When both are
+# provided SSL will be enabled. This does not change the web server port.
+web_server_ssl_cert = /etc/airflow/certs/airflow.crt
+web_server_ssl_key = /etc/airflow/certs/airflow.key
+
+# Number of seconds the webserver waits before killing gunicorn master that doesn't respond
+web_server_master_timeout = 120
+
+# Number of seconds the gunicorn webserver waits before timing out on a worker
+web_server_worker_timeout = 120
+
+# Number of workers to refresh at a time. When set to 0, worker refresh is
+# disabled. When nonzero, airflow periodically refreshes webserver workers by
+# bringing up new ones and killing old ones.
+worker_refresh_batch_size = 1
+
+# Number of seconds to wait before refreshing a batch of workers.
+worker_refresh_interval = 30
+
+# Secret key used to run your flask app
+# It should be as random as possible
+secret_key = {SECRET_KEY}
+
+# Number of workers to run the Gunicorn web server
+workers = 4
+
+# The worker class gunicorn should use. Choices include
+# sync (default), eventlet, gevent
+worker_class = sync
+
+# Log files for the gunicorn webserver. '-' means log to stderr.
+access_logfile = {{ airflow_gunicorn_access_log }}
+error_logfile = {{ airflow_gunicorn_error_log }} 
+
+# Expose the configuration file in the web server
+# This is only applicable for the flask-admin based web UI (non FAB-based).
+# In the FAB-based web UI with RBAC feature,
+# access to configuration is controlled by role permissions.
+expose_config = False
+
+# Set to true to turn on authentication:
+# https://airflow.incubator.apache.org/security.html#web-authentication
+authenticate = False
+
+# Filter the list of dags by owner name (requires authentication to be enabled)
+filter_by_owner = False
+
+# Filtering mode. Choices include user (default) and ldapgroup.
+# Ldap group filtering requires using the ldap backend
+#
+# Note that the ldap server needs the "memberOf" overlay to be set up
+# in order to user the ldapgroup mode.
+owner_mode = user
+
+# Default DAG view.  Valid values are:
+# tree, graph, duration, gantt, landing_times
+dag_default_view = tree
+
+# Default DAG orientation. Valid values are:
+# LR (Left->Right), TB (Top->Bottom), RL (Right->Left), BT (Bottom->Top)
+dag_orientation = LR
+
+# Puts the webserver in demonstration mode; blurs the names of Operators for
+# privacy.
+demo_mode = False
+
+# The amount of time (in secs) webserver will wait for initial handshake
+# while fetching logs from other worker machine
+log_fetch_timeout_sec = 5
+
+# By default, the webserver shows paused DAGs. Flip this to hide paused
+# DAGs by default
+hide_paused_dags_by_default = False
+
+# Consistent page size across all listing views in the UI
+page_size = 100
+
+# Default dagrun to show in UI
+default_dag_run_display_number = 25
+
+# Enable werkzeug `ProxyFix` middleware
+enable_proxy_fix = False
+
+[celery]
+ssl_active = True
+ssl_key = /etc/airflow/certs/airflow.key
+ssl_cert = /etc/airflow/certs/airflow.crt

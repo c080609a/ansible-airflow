@@ -1,0 +1,69 @@
+---
+miniconda_platform: '{{ansible_system}}-{{ansible_machine}}'
+miniconda_mirror: https://repo.continuum.io/miniconda
+miniconda_python_ver: 3
+miniconda_ver: '4.5.4'
+miniconda_name: 'Miniconda{{miniconda_python_ver}}-{{miniconda_ver}}-{{miniconda_platform}}'
+miniconda_installer_sh: '{{miniconda_name}}.sh'
+miniconda_installer_url: '{{miniconda_mirror}}/{{miniconda_installer_sh}}'
+miniconda_parent_dir: /usr/local
+miniconda_link_dir: '{{miniconda_parent_dir}}/{{miniconda_link_subdir}}'
+miniconda_install_dir: '{{miniconda_parent_dir}}/{{miniconda_name}}'
+miniconda_link_subdir: anaconda
+miniconda_conda_bin: '{{miniconda_link_dir}}/bin/conda'
+miniconda_env_pkgs: "ipython pandas"
+
+# miniconda_installer:
+#   url: 'https://repo.continuum.io/miniconda'
+#   file: 'Miniconda3-latest-Linux-x86_64.sh'
+
+# miniconda_path: "~/.miniconda"
+# miniconda_env_python_version: 3.6
+
+# # defaults file for miniconda
+# miniconda_mirror: https://repo.continuum.io/miniconda
+# miniconda_python_ver: 3
+
+# miniconda_ver: '4.5.4'
+# # https://repo.continuum.io/miniconda/
+# miniconda_checksums:
+#   Miniconda2-4.2.12-Linux-x86_64.sh: md5:c8b836baaa4ff89192947e4b1a70b07e
+#   Miniconda3-4.2.12-Linux-x86_64.sh: md5:d0c7c71cc5659e54ab51f2005a8d96f3
+#   Miniconda2-4.3.21-Linux-x86_64.sh: md5:7097150146dd3b83c805223663ebffcc
+#   Miniconda3-4.3.21-Linux-x86_64.sh: md5:c1c15d3baba15bf50293ae963abef853
+#   Miniconda2-4.3.30-Linux-x86_64.sh: md5:bd1655b4b313f7b2a1f2e15b7b925d03
+#   Miniconda3-4.3.30-Linux-x86_64.sh: md5:0b80a152332a4ce5250f3c09589c7a81
+#   Miniconda2-4.3.31-Linux-x86_64.sh: md5:da2dd466d26e33a2b1f72fdb853a8ff0
+#   Miniconda3-4.3.31-Linux-x86_64.sh: md5:7fe70b214bee1143e3e3f0467b71453c
+#   Miniconda2-4.5.1-Linux-x86_64.sh: md5:332aeff0bb6b45bbf7e220dec17ba867
+#   Miniconda3-4.5.1-Linux-x86_64.sh: md5:0c28787e3126238df24c5d4858bd0744
+#   Miniconda2-4.5.4-Linux-x86_64.sh: md5:8a1c02f6941d8778f8afad7328265cf5
+#   Miniconda3-4.5.4-Linux-x86_64.sh: md5:a946ea1d0c4a642ddf0c3a26a18bb16d
+
+# miniconda_timeout_seconds: 600
+
+# # add the miniconda python onto the front of the path.
+# miniconda_make_sys_default: False
+
+# miniconda_parent_dir: /usr/local
+
+# # for ease of use as a drop in replacements for an anaconda installation
+# miniconda_link_subdir: anaconda
+
+# miniconda_pkg_update: True
+
+# # become root?
+# miniconda_escalate: True
+
+
+# miniconda_platform: '{{ansible_system}}-{{ansible_machine}}'
+# miniconda_name: 'Miniconda{{miniconda_python_ver}}-{{miniconda_ver}}-{{miniconda_platform}}'
+# miniconda_installer_sh: '{{miniconda_name}}.sh'
+# miniconda_installer_url: '{{miniconda_mirror}}/{{miniconda_installer_sh}}'
+# miniconda_checksum: '{{miniconda_checksums[miniconda_installer_sh]}}'
+
+# miniconda_install_dir: '{{miniconda_parent_dir}}/{{miniconda_name}}'
+# miniconda_link_dir: '{{miniconda_parent_dir}}/{{miniconda_link_subdir}}'
+
+# miniconda_conda_bin: '{{miniconda_link_dir}}/bin/conda'
+

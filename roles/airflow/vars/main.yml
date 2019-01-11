@@ -1,0 +1,28 @@
+key_file: /etc/airflow/certs/airflow.key
+cert_file: /etc/airflow/certs/airflow.crt
+
+airflow_user: "airflow_user"
+airflow_user_home: "/home/airflow_user"
+
+airflow_executable_dir: "{{ miniconda_link_dir }}/bin"
+airflow_home: /etc/airflow
+airflow_dags_folder: "{{ airflow_home }}/dags"
+airflow_logs_folder: /var/log/airflow
+airflow_webserver_port: 8081
+airflow_log: "{{ airflow_logs_folder }}/airflow.log"
+airflow_gunicorn_access_log: "{{ airflow_logs_folder }}/access.log"
+airflow_gunicorn_error_log: "{{ airflow_logs_folder }}/error.log"
+airflow_child_process_log_folder: "{{ airflow_logs_folder }}/scheduler"
+airflow_pidfile: "/etc/airflow/airflow-webserver.pid"
+airflow_environment_extra_vars: []
+airflow_logging_level: "INFO"
+airflow_fab_logging_level: "WARN"
+airflow_log_format: "[%%(asctime)s] {{ '{' }}%%(filename)s:%%(lineno)d} %%(levelname)s - %%(message)s"
+airflow_simple_log_format: "%%(asctime)s %%(levelname)s - %%(message)s"
+
+airflow_log_filename_template: "{{ '{{' }} ti.dag_id {{ '}}' }}/{{ '{{' }} ti.task_id {{ '}}' }}/{{ '{{' }} ts {{ '}}' }}/{{ '{{' }} try_number {{ '}}' }}.log"
+airflow_log_processor_filename_template: "{{ '{{' }} filename {{ '}}' }}.log"
+
+airflow_hostname_callable: "socket:getfqdn"
+
+airflow_default_timezone: "utc"

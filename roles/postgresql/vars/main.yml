@@ -1,0 +1,36 @@
+postgresql_version: "9.1"
+postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+postgresql_bin_path: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"
+postgresql_user: postgres
+postgresql_group: postgres
+postgresql_unix_socket_directories:
+  - /var/run/postgresql
+# Global configuration options that will be set in postgresql.conf.
+postgresql_global_config_options:
+  - option: unix_socket_directories
+    value: '{{ postgresql_unix_socket_directories | join(",") }}'
+
+# Host based authentication (hba) entries to be added to the pg_hba.conf. This
+# variable's defaults reflect the defaults that come with a fresh installation.
+postgresql_hba_entries:
+  - {type: local, database: all, user: postgres, auth_method: peer}
+  - {type: local, database: all, user: all, auth_method: peer}
+  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5}
+  - {type: host, database: all, user: all, address: '::1/128', auth_method: md5}
+
+# Debian only. Used to generate the locales used by PostgreSQL databases.
+postgresql_locales:
+  - 'en_US.UTF-8'
+
+pg_superuser_username: airflow_db
+pg_superuser_password: airflow_db
+pg_host: localhost
+airflow_user: "airflow_user"
+airflow_user_home: "/home/airflow_user"
+
+airflow_executable_dir: "{{ miniconda_link_dir }}/bin"
+airflow_home: /etc/airflow
+airflow_dags_folder: "{{ airflow_home }}/dags"
+airflow_logs_folder: /var/log/airflow
+airflow_webserver_port: 8081

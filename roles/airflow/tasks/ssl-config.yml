@@ -1,0 +1,21 @@
+---
+- name: Create directories for TLS certificates
+  file:
+    path: /etc/airflow/certs
+    state: directory
+  become: true
+
+- name: Copy TLS key
+  copy:
+    src: files/airf.key
+    dest: "{{ key_file }}"
+    owner: root
+    mode: 0600
+  become: true
+
+- name: Copy TLS certificate
+  copy:
+    src: files/airf.crt
+    dest: "{{ cert_file }}"
+  become: true
+  

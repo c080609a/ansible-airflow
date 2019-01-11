@@ -1,0 +1,77 @@
+#!/bin/sh
+
+. /etc/rc.d/init.d/functions
+. /etc/sysconfig/network
+
+[ "$NETWORKING" = "no" ] && exit 0
+
+EXEC_SCRIPT="{{ airflow_executable_dir }}/airflow"
+PID_FILE="{{ airflow_pidfile }}"
+RUN_USER="{{ airflow_user }}"
+
+if ! grep "^$RUN_USER:" /etc/passwd > /dev/null
+then
+  echo "User doesn't exist: $RUN_USER"
+  exit
+fi
+
+prog='airflow'
+
+start() {
+    echo -n $"Starting $prog: "
+    PATH=$PATH:{{ airflow_executable_dir }} \
+    AIRFLOW_HOME={{ airflow_home }} \
+    daemon --user {{ airflow_user }} \
+    --pidfile=$PID_FILE \
+    {{ airflow_executable_dir }}/airflow webserver &
+    retval=$?
+    echo "Started"
+    [ $retval -eq 0 ] 
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    rm -f /etc/airflow/airflow-webserver.pid 
+    ps -ef | grep "gunicorn: master" | grep -v 'grep' | awk '{ print $2 }' | xargs kill -s SIGKILL
+    ps -ef | grep "gunicorn: worker" | grep -v 'grep' | awk '{ print $2 }' | xargs kill -s SIGKILL
+    ps -ef | grep "airflow" | grep -v 'grep' | awk '{ print $2 }' | xargs kill -s SIGKILL
+    ps -ef | grep "airflow webserver" | grep -v 'grep' | awk '{ print $2 }' | xargs kill -s SIGKILL 
+    retval=$?
+    echo
+    [ $retval -eq 0 ] 
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+rh_status() {
+    status -p $PID_FILE $prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status && exit 0
+        $1
+        ;;
+    stop)
+        rh_status || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    status|status_q)
+        rh_$1
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|reload|status|restart|}"
+        exit 2
+esac

@@ -1,0 +1,74 @@
+#!/bin/bash
+
+EXEC_SCRIPT="{{ airflow_executable_dir }}/airflow"
+CMDNAME=`basename $0`
+LOG_DIR=/var/log/airflow
+PID_DIR=/var/run
+PID_FILE="$PID_DIR"/airflow_webserver.pid
+LOG_FILE="$LOG_DIR"/webserver.log
+PORT=8888
+RUN_USER="{{ airflow_user }}"
+
+if ! grep "^$RUN_USER:" /etc/passwd > /dev/null
+then
+  echo "User doesn't exist: $RUN_USER"
+  exit
+fi
+
+# Source function library
+. /etc/init.d/functions
+
+# Source run_user profile
+. /home/$RUN_USER/.bash_profile
+
+test -d $LOG_DIR || mkdir $LOG_DIR; chmod -R 777 $LOG_DIR
+
+RETVAL=0
+
+case "$1" in
+    start)
+        echo $PID_FILE
+        if [ ! -f "$PID_FILE" ]; then
+          echo "Starting Airflow webserver"
+          # cd "{{ airflow_user_home }}"
+          # sudo /sbin/runuser $RUN_USER -s /bin/bash -c "$EXEC_SCRIPT webserver -p $PORT 0<&- &> $LOG_FILE &"
+          # TODO: switch to airflow_user and run
+          $EXEC_SCRIPT webserver -p $PORT --pid $PID_FILE  &
+          ps aux | grep "airflow webserver" | grep -v grep | awk '{ print $2 }' > $PID_FILE
+          success
+        else
+          echo -n "Airflow webserver is already running"
+          RETVAL=1
+          failure
+        fi
+        ;;
+    stop)
+        if [ -f "$PID_FILE" ]; then
+          echo -n "Stopping Airflow webserver"
+          test -f $PID_FILE && cat $PID_FILE | xargs kill -s SIGKILL
+          ps aux | grep "gunicorn: master \[airflow.www.app:cached_app()\]" | awk '{ print $2 }' | xargs kill -s SIGKILL 
+          ps aux | grep "gunicorn: worker \[airflow.www.app:cached_app()\]" | awk '{ print $2 }' | xargs kill -s SIGKILL 
+          rm -f $PID_FILE
+          success
+        else
+          echo -n "Airflow webserver is not running"
+          RETVAL=1
+          failure
+        fi
+        echo
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        ;;
+    status)
+        status airflow server
+        RETVAL=$?
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart|reload}"
+        exit 1
+        ;;
+esac
+
+exit $RETVAL
