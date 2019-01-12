@@ -1,6 +1,10 @@
 ---
+- include: './roles/db_time.yml'        
+  tags: [db]
+  
 - include: './roles/airflow_time.yml'        
   tags: [airflow]
 
-- include: './roles/db_time.yml'        
-  tags: [db]
+- include: './roles/nginx_time.yml'        
+  tags: [nginx]
+
