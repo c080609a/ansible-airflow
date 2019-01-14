@@ -3,6 +3,7 @@
   apt: 
     name: '{{ item }}' 
     state: present
+    update_cache: true
   become: true
   with_items: 
     - postgresql
@@ -25,6 +26,23 @@
     state: present
     role_attr_flags: CREATEDB,SUPERUSER
   become_user: postgres
+  become: true
+
+- name: Configure pg_hba.conf 
+  template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ postgresql_config_path }}/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0600
+  when: postgresql_hba_entries
+  become: true
+
+- name: Configure postgresql.conf
+  lineinfile:
+    dest: "{{ postgresql_config_path }}/postgresql.conf" 
+    line: "listen_addresses = '*'"
+  notify: restart postgresql
   become: true
 
 - name: Create new PostgreSQL database

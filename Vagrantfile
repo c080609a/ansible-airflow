@@ -9,8 +9,6 @@ Vagrant.configure("2") do |config|
 		app.vm.network "private_network", ip: "192.168.60.5"
 		app.vm.network "forwarded_port", guest: 80, host: 8080
   	app.vm.network "forwarded_port", guest: 443, host: 8443
-  	app.vm.provision "shell",
-  	inline: "echo '127.0.0.1 localhost app1\n192.168.60.6 db' > /etc/hosts"
 	end
 
 	config.vm.define "db" do |db|

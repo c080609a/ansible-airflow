@@ -22,6 +22,24 @@
     dest: "/home/{{ airflow_user }}/.bashrc"
     line: "PATH=$PATH:{{ airflow_executable_dir }}"
 
+- name: Up with people 
+  become: yes
+  lineinfile:
+    dest: "/home/{{ airflow_user }}/.bashrc"
+    line: "alias up='cd ..'"
+
+- name: Up with people 2
+  become: yes
+  lineinfile:
+    dest: "/root/.bashrc"
+    line: "alias up='cd ..'"
+
+- name: Up with people 2
+  become: yes
+  lineinfile:
+    dest: "/home/vagrant/.bashrc"
+    line: "alias up='cd ..'"
+
 - name: Set AIRFLOW_HOME
   become: yes
   lineinfile:
@@ -30,7 +48,7 @@
 
 - name: Install Airflow from conda-forge channel
   become: yes
-  command: "{{ miniconda_conda_bin }} install --yes -c conda-forge airflow-with-password"
+  command: "{{ miniconda_conda_bin }} install --yes -c conda-forge airflow-with-postgres"
   when: not airflow_binary.stat.exists
 
 - name: Create Airflow directories
@@ -61,7 +79,8 @@
   shell: "{{ airflow_executable_dir }}/airflow initdb"
   environment:
     AIRFLOW_HOME: "{{ airflow_home }}"
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: "sqlite:////tmp/airflow.db"
+    # AIRFLOW__CORE__SQL_ALCHEMY_CONN: "sqlite:////tmp/airflow.db"
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: "{{ pg_connection }}" 
 
 - name: Copy airflow init.d script
   template:
@@ -72,15 +91,14 @@
     mode:  0641
   become: yes
 
+- name: Stop Airflow service
+  service:
+    name: airflow
+    state: stopped
+  become: yes
 
-# - name: Stop Airflow service
-#   service:
-#     name: airflow
-#     state: stopped
-#   become: yes
-
-# - name: Start Airflow service
-#   service:
-#     name: airflow
-#     state: started
-#   become: yes
+- name: Start Airflow service
+  service:
+    name: airflow
+    state: started
+  become: yes

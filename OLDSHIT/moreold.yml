@@ -3,9 +3,6 @@
   register: miniconda_installed
   ignore_errors: yes
 
-- debug: 
-    msg: "miniconda_installed: {{ miniconda_installed.rc == 0 }}"
-
 - name: Download miniconda installer
   get_url:
     url={{ miniconda_installer.url }}/{{ miniconda_installer.file }}

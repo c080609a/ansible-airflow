@@ -26,3 +26,5 @@ airflow_log_processor_filename_template: "{{ '{{' }} filename {{ '}}' }}.log"
 airflow_hostname_callable: "socket:getfqdn"
 
 airflow_default_timezone: "utc"
+
+pg_connection: postgresql+psycopg2://airflow_db:airflow_db@192.168.60.6:5432/airflow_metadata

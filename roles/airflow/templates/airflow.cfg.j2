@@ -7,9 +7,7 @@ airflow_home = {{ airflow_home }}
 # This path must be absolute
 dags_folder = {{ airflow_dags_folder }}
 
-# sql_alchemy_conn = sqlite:///{{ airflow_home }}/airflow.db
-sql_alchemy_conn = sqlite:////tmp/airflow.db
-
+sql_alchemy_conn =postgresql+psycopg2://airflow_db:airflow_db@192.168.60.6:5432/airflow_metadata
 # The folder where airflow should store its log files
 # This path must be absolute
 base_log_folder = {{ airflow_logs_folder }}
@@ -34,15 +32,15 @@ default_timezone = {{ airflow_default_timezone }}
 base_url = https://localhost:443
 
 # The ip specified when starting the web server
-web_server_host = 0.0.0.0
+web_server_host = localhost
 
 # The port on which to run the web server
-web_server_port = 443
+web_server_port = 3000
 
 # Paths to the SSL certificate and key for the web server. When both are
 # provided SSL will be enabled. This does not change the web server port.
-web_server_ssl_cert = /etc/airflow/certs/airflow.crt
-web_server_ssl_key = /etc/airflow/certs/airflow.key
+#web_server_ssl_cert = /etc/nginx/ssl/nginx.crt
+#web_server_ssl_key = /etc/nginx/ssl/nginx.key
 
 # Number of seconds the webserver waits before killing gunicorn master that doesn't respond
 web_server_master_timeout = 120

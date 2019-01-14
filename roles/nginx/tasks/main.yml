@@ -9,7 +9,7 @@
 - name: Install nginx 
   yum: 
     name: nginx
-    # update_cache: yes
+    update_cache: yes
   become: true
 
 - name: Create nginx sites directories
@@ -28,7 +28,7 @@
 - name: Copy nginx config
   template:
     src: nginx.conf.j2
-    dest: /etc/nginx/sites-available/default
+    dest: /etc/nginx/nginx.conf
     mode: 644
   become: true
 
@@ -37,7 +37,7 @@
     src: files/nginx.key
     dest: /etc/nginx/ssl/nginx.key
     owner: root
-    mode: 600
+    mode: 644
   become: true 
 
 - name: Copy SSL cert
@@ -45,16 +45,8 @@
     src: files/nginx.crt
     dest: /etc/nginx/ssl/nginx.crt
     owner: root
-    mode: 600
+    mode: 644
   become: true 
-
-
-- name: Enable configuration
-  file:
-    dest: /etc/nginx/sites-enabled/default
-    src: /etc/nginx/sites-available/default
-    state: link
-  become: true
 
 - name: copy index.html
   template: 
